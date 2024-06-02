@@ -14,6 +14,7 @@ const Timer = ({ handleClick, min, sec, mode }) => {
         id="beep"
         src="https://www.pacdv.com/sounds/interface_sound_effects/sound10.mp3"
         type="audio/mp3"
+        preload="none"
       ></audio>
     </div>
   );

@@ -19,30 +19,44 @@ function App() {
   useEffect(() => {
     if (pause) {
       interval.current = setInterval(() => {
+        if (sec < 0) {
+          console.log("sec", sec);
+        }
         if (min === 0 && sec === 0) {
-          if (active) {
-            setMin(brLeng);
-            setMode("Break");
-            setActive(!active);
-          } else {
-            setMin(seLeng);
-            setMode("Session");
-            setActive(!active);
+          let playPromise = document.querySelector("#beep").play();
+
+          if (playPromise !== undefined) {
+            playPromise
+              .then((_) => {
+                if (active) {
+                  setMin(brLeng);
+                  setSec(0);
+                  setMode("Break");
+                  setActive(!active);
+                } else {
+                  setMin(seLeng);
+                  setSec(0);
+                  setMode("Session");
+                  setActive(!active);
+                }
+              })
+              .catch((error) => {
+                // Auto-play was prevented
+                // Show paused UI.
+                console.log(error);
+              });
           }
-          document.querySelector("#beep").play();
 
           clearInterval(interval.current);
         }
         if (min > 0 && sec === 0) {
           setSec(59);
-          setMin((prev) => {
-            return prev - 1;
-          });
+          let newMin = min - 1;
+          setMin(newMin);
         }
         if (sec > 0) {
-          setSec((prev) => {
-            return prev - 1;
-          });
+          let secNew = sec - 1;
+          setSec(secNew);
         }
       }, 1000);
     }
@@ -77,17 +91,15 @@ function App() {
     document.querySelector("#beep").currentTime = 0;
   };
 
-  console.log(mode);
-
   const timerLength = (data) => {
     if (data.matches("#break-decrement")) {
       if (brLeng > 1) {
-        return setBrLeng(brLeng - 1);
+        setBrLeng((prev) => prev - 1);
       }
     }
     if (data.matches("#break-increment")) {
       if (brLeng < 60) {
-        return setBrLeng(brLeng + 1);
+        setBrLeng((prev) => prev + 1);
       }
     }
     if (data.matches("#session-decrement")) {
